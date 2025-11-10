@@ -1,0 +1,22 @@
+# ビルド成果物
+bin/
+obj/
+
+# ユーザー固有設定
+*.user
+*.rsuser
+*.suo
+
+# 一時ファイル
+*.tmp
+*.log
+
+# VS Code
+.vscode/
+
+# Rider / JetBrains
+.idea/
+
+# OS 固有
+.DS_Store
+Thumbs.db
