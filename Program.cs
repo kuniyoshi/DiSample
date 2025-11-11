@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddSingleton<IReadOnlyList<Hero>>(_ => new List<Hero>
+services.AddTransient<IReadOnlyList<Hero>>(_ => new List<Hero>
 {
     new(new("Satoka"), new(100)),
     new(new("Io"), new(100)),
@@ -10,12 +10,14 @@ services.AddSingleton<IReadOnlyList<Hero>>(_ => new List<Hero>
     new(new("Yumi"), new(100)),
     new(new("Mana"), new(100)),
 });
-services.AddSingleton(sp => new Team(sp.GetRequiredService<IReadOnlyList<Hero>>()));
-services.AddSingleton(sp => new Game(sp.GetRequiredService<Team>()));
+services.AddTransient(sp => new Team(sp.GetRequiredService<IReadOnlyList<Hero>>()));
+services.AddTransient(sp => new Game(sp.GetRequiredService<Team>()));
 
 using var provider = services.BuildServiceProvider();
 
-var game = provider.GetRequiredService<Game>();
+using var scope = provider.CreateScope();
+
+var game = scope.ServiceProvider.GetRequiredService<Game>();
 
 var hp = game.Team.Heroes.FirstOrDefault()?.Hp.Value;
 
