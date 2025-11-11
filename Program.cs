@@ -10,7 +10,7 @@ services.AddTransient<IReadOnlyList<Hero>>(_ => new List<Hero>
     new(new("Yumi"), new(100)),
     new(new("Mana"), new(100)),
 });
-services.AddTransient(sp => new Team(sp.GetRequiredService<IReadOnlyList<Hero>>()));
+services.AddTransient(sp => new Team(new("Altair Torte"), sp.GetRequiredService<IReadOnlyList<Hero>>()));
 services.AddTransient(sp => new Game(sp.GetRequiredService<Team>()));
 
 using var provider = services.BuildServiceProvider();
@@ -57,10 +57,12 @@ class Hero
 
 class Team
 {
+    internal Name Name { get; }
     internal IReadOnlyList<Hero> Heroes { get; }
 
-    internal Team(IReadOnlyList<Hero> heroes)
+    internal Team(Name name, IReadOnlyList<Hero> heroes)
     {
+        Name = name;
         Heroes = heroes;
     }
 }
