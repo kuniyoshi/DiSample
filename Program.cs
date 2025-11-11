@@ -1,6 +1,10 @@
 var heroes = new List<Hero>
 {
-    new(new Hp(100))
+    new(new("Satoka"), new(100)),
+    new(new("Io"), new(100)),
+    new(new("Tsubame"), new(100)),
+    new(new("Yumi"), new(100)),
+    new(new("Mana"), new(100)),
 };
 
 var game = new Game(new Team(heroes));
@@ -19,12 +23,24 @@ class Hp
     }
 }
 
+class Name
+{
+    internal string Value { get; }
+
+    internal Name(string value)
+    {
+        Value = value;
+    }
+}
+
 class Hero
 {
     internal Hp Hp { get; }
+    internal Name Name { get; }
 
-    internal Hero(Hp hp)
+    internal Hero(Name name, Hp hp)
     {
+        Name = name;
         Hp = hp;
     }
 }
