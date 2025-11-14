@@ -2,30 +2,28 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddTransient<IReadOnlyList<Team>>(_ => new List<Team>
-{
+services.AddTransient<IReadOnlyList<Team>>(static _ =>
+[
     new(
         new("Altair Torte"),
-        new List<Hero>
-        {
+        [
             new(new("Satoka"), new(100)),
             new(new("Io"), new(100)),
             new(new("Tsubame"), new(100)),
             new(new("Yumi"), new(100)),
             new(new("Mana"), new(100)),
-        }),
+        ]),
     new(
         new("Procyon Pudding"),
-        new List<Hero>
-        {
+        [
             new(new("Sasa"), new(100)),
             new(new("Haruka"), new(100)),
             new(new("Amane"), new(100)),
             new(new("Itsumi"), new(100)),
             new(new("Mano"), new(100)),
-        }),
-});
-services.AddTransient(sp => new Game(sp.GetRequiredService<IReadOnlyList<Team>>()));
+        ]),
+]);
+services.AddTransient(static sp => new Game(sp.GetRequiredService<IReadOnlyList<Team>>()));
 
 using var provider = services.BuildServiceProvider();
 
