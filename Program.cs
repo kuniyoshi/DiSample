@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
 var teams = CreateTeams();
-var selectedTeamName = SelectTeamName(teams.Select(team => team.Name.Value).ToList());
+var selectedTeamName = SelectTeamName([.. teams.Select(team => team.Name.Value)]);
 
 services.AddSingleton<IReadOnlyList<Team>>(teams);
 services.AddSingleton(selectedTeamName);
