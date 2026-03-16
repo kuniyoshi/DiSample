@@ -34,29 +34,30 @@ var hp = game.Team.Heroes.FirstOrDefault()?.Hp.Value;
 
 Console.WriteLine(hp);
 
-static IReadOnlyList<Team> CreateTeams() => new List<Team>
+static IReadOnlyList<Team> CreateTeams()
 {
+    return
+[
     new(
         new("Altair Torte"),
-        new List<Hero>
-        {
+        [
             new(new("Satoka"), new(100)),
             new(new("Io"), new(100)),
             new(new("Tsubame"), new(100)),
             new(new("Yumi"), new(100)),
             new(new("Mana"), new(100)),
-        }),
+        ]),
     new(
         new("Procyon Pudding"),
-        new List<Hero>
-        {
+        [
             new(new("Sasa"), new(100)),
             new(new("Haruka"), new(100)),
             new(new("Amane"), new(100)),
             new(new("Itsumi"), new(100)),
             new(new("Mano"), new(100)),
-        }),
-};
+        ]),
+];
+}
 
 static string SelectTeamName(IReadOnlyList<string> teamNames)
 {
