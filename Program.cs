@@ -12,8 +12,8 @@ services.AddTransient<Team>(static sp =>
     var targetTeamName = sp.GetRequiredService<string>();
     var registeredTeams = sp.GetRequiredService<IReadOnlyList<Team>>();
 
-    var team = registeredTeams.FirstOrDefault(
-        t => string.Equals(t.Name.Value, targetTeamName, StringComparison.OrdinalIgnoreCase));
+    var team = registeredTeams.FirstOrDefault(t =>
+        string.Equals(t.Name.Value, targetTeamName, StringComparison.OrdinalIgnoreCase));
 
     if (team is null)
     {
@@ -37,26 +37,26 @@ Console.WriteLine(hp);
 static IReadOnlyList<Team> CreateTeams()
 {
     return
-[
-    new(
-        new("Altair Torte"),
-        [
-            new(new("Satoka"), new(100)),
-            new(new("Io"), new(100)),
-            new(new("Tsubame"), new(100)),
-            new(new("Yumi"), new(100)),
-            new(new("Mana"), new(100)),
-        ]),
-    new(
-        new("Procyon Pudding"),
-        [
-            new(new("Sasa"), new(100)),
-            new(new("Haruka"), new(100)),
-            new(new("Amane"), new(100)),
-            new(new("Itsumi"), new(100)),
-            new(new("Mano"), new(100)),
-        ]),
-];
+    [
+        new(
+            new("Altair Torte"),
+            [
+                new(new("Satoka"), new(100)),
+                new(new("Io"), new(100)),
+                new(new("Tsubame"), new(100)),
+                new(new("Yumi"), new(100)),
+                new(new("Mana"), new(100)),
+            ]),
+        new(
+            new("Procyon Pudding"),
+            [
+                new(new("Sasa"), new(100)),
+                new(new("Haruka"), new(100)),
+                new(new("Amane"), new(100)),
+                new(new("Itsumi"), new(100)),
+                new(new("Mano"), new(100)),
+            ]),
+    ];
 }
 
 static string SelectTeamName(IReadOnlyList<string> teamNames)
@@ -78,8 +78,7 @@ static string SelectTeamName(IReadOnlyList<string> teamNames)
             return teamNames[index - 1];
         }
 
-        var byName = teamNames.FirstOrDefault(
-            name => string.Equals(name, input, StringComparison.OrdinalIgnoreCase));
+        var byName = teamNames.FirstOrDefault(name => string.Equals(name, input, StringComparison.OrdinalIgnoreCase));
 
         if (!string.IsNullOrWhiteSpace(byName))
         {
