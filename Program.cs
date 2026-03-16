@@ -2,7 +2,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-var teams = CreateTeams();
+var teamCsv =
+    """
+    Altair Torte, Satoka, 100
+    Altair Torte, Io, 100
+    Altair Torte, Tsubame, 100
+    Altair Torte, Yumi, 100
+    Altair Torte, Mana, 100
+    Procyon Pudding, Sasa, 100
+    Procyon Pudding, Haruka, 100
+    Procyon Pudding, Amane, 100
+    Procyon Pudding, Itsumi, 100
+    Procyon Pudding, Mano, 100
+    """;
+
+var teams = CreateTeams(teamCsv);
 var selectedTeamName = SelectTeamName([.. teams.Select(team => team.Name.Value)]);
 
 services.AddSingleton<IReadOnlyList<Team>>(teams);
@@ -34,29 +48,54 @@ var hp = game.Team.Heroes.FirstOrDefault()?.Hp.Value;
 
 Console.WriteLine(hp);
 
-static IReadOnlyList<Team> CreateTeams()
+static IReadOnlyList<Team> CreateTeams(string csv)
 {
-    return
-    [
-        new(
-            new("Altair Torte"),
-            [
-                new(new("Satoka"), new(100)),
-                new(new("Io"), new(100)),
-                new(new("Tsubame"), new(100)),
-                new(new("Yumi"), new(100)),
-                new(new("Mana"), new(100)),
-            ]),
-        new(
-            new("Procyon Pudding"),
-            [
-                new(new("Sasa"), new(100)),
-                new(new("Haruka"), new(100)),
-                new(new("Amane"), new(100)),
-                new(new("Itsumi"), new(100)),
-                new(new("Mano"), new(100)),
-            ]),
-    ];
+    var teams = new List<Team>();
+    var teamHeroes = new Dictionary<string, List<Hero>>(StringComparer.OrdinalIgnoreCase);
+    var teamNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    using var reader = new StringReader(csv);
+
+    while (reader.ReadLine() is { } line)
+    {
+        var rawLine = line.Trim();
+
+        if (string.IsNullOrWhiteSpace(rawLine))
+        {
+            continue;
+        }
+
+        var columns = rawLine.Split(',', StringSplitOptions.TrimEntries);
+
+        if (columns.Length != 3)
+        {
+            throw new FormatException($"CSV の形式が不正です: '{rawLine}'");
+        }
+
+        var teamName = columns[0];
+        var characterName = columns[1];
+
+        if (!int.TryParse(columns[2], out var hp))
+        {
+            throw new FormatException($"hp は整数で指定してください: '{rawLine}'");
+        }
+
+        if (!teamHeroes.TryGetValue(teamName, out var heroes))
+        {
+            heroes = [];
+            teamHeroes[teamName] = heroes;
+            teamNames[teamName] = teamName;
+        }
+
+        heroes.Add(new Hero(new(characterName), new(hp)));
+    }
+
+    foreach (var entry in teamHeroes)
+    {
+        teams.Add(new Team(new(teamNames[entry.Key]), entry.Value));
+    }
+
+    return teams;
 }
 
 static string SelectTeamName(IReadOnlyList<string> teamNames)
