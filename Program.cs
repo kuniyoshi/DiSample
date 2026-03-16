@@ -17,26 +17,9 @@ var teamCsv =
     """;
 
 var teams = CreateTeams(teamCsv);
-var selectedTeamName = SelectTeamName([.. teams.Select(team => team.Name.Value)]);
 
 services.AddSingleton<IReadOnlyList<Team>>(teams);
-services.AddSingleton(selectedTeamName);
-services.AddTransient<Team>(static sp =>
-{
-    var targetTeamName = sp.GetRequiredService<string>();
-    var registeredTeams = sp.GetRequiredService<IReadOnlyList<Team>>();
-
-    var team = registeredTeams.FirstOrDefault(t =>
-        string.Equals(t.Name.Value, targetTeamName, StringComparison.OrdinalIgnoreCase));
-
-    if (team is null)
-    {
-        throw new InvalidOperationException($"Team '{targetTeamName}' は見つかりませんでした。");
-    }
-
-    return team;
-});
-services.AddTransient(static sp => new Game(sp.GetRequiredService<Team>()));
+services.AddTransient(static sp => new Game(sp.GetRequiredService<IReadOnlyList<Team>>()));
 
 using var provider = services.BuildServiceProvider();
 
@@ -98,36 +81,6 @@ static IReadOnlyList<Team> CreateTeams(string csv)
     return teams;
 }
 
-static string SelectTeamName(IReadOnlyList<string> teamNames)
-{
-    while (true)
-    {
-        Console.WriteLine("チームを選択してください:");
-
-        for (var i = 0; i < teamNames.Count; i++)
-        {
-            Console.WriteLine($"{i + 1}. {teamNames[i]}");
-        }
-
-        Console.Write("> ");
-        var input = Console.ReadLine();
-
-        if (int.TryParse(input, out var index) && index is >= 1 and <= int.MaxValue && index <= teamNames.Count)
-        {
-            return teamNames[index - 1];
-        }
-
-        var byName = teamNames.FirstOrDefault(name => string.Equals(name, input, StringComparison.OrdinalIgnoreCase));
-
-        if (!string.IsNullOrWhiteSpace(byName))
-        {
-            return byName;
-        }
-
-        Console.WriteLine("無効な入力です。もう一度入力してください。");
-    }
-}
-
 class Hp
 {
     internal int Value { get; }
@@ -176,8 +129,39 @@ class Game
 {
     internal Team Team { get; }
 
-    internal Game(Team team)
+    internal Game(IReadOnlyList<Team> teams)
     {
-        Team = team;
+        Team = SelectTeam(teams);
+    }
+
+    private static Team SelectTeam(IReadOnlyList<Team> teams)
+    {
+        while (true)
+        {
+            Console.WriteLine("チームを選択してください:");
+
+            for (var i = 0; i < teams.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {teams[i].Name.Value}");
+            }
+
+            Console.Write("> ");
+            var input = Console.ReadLine();
+
+            if (int.TryParse(input, out var index) && index is >= 1 and <= int.MaxValue && index <= teams.Count)
+            {
+                return teams[index - 1];
+            }
+
+            var byName = teams.FirstOrDefault(team =>
+                string.Equals(team.Name.Value, input, StringComparison.OrdinalIgnoreCase));
+
+            if (byName is not null)
+            {
+                return byName;
+            }
+
+            Console.WriteLine("無効な入力です。もう一度入力してください。");
+        }
     }
 }
